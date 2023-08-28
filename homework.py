@@ -1,5 +1,5 @@
-from dataclasses import dataclass, asdict
-from typing import Dict, Type
+from dataclasses import asdict, dataclass
+from typing import ClassVar, Dict, Type
 
 
 @dataclass
@@ -17,11 +17,13 @@ class InfoMessage:
     distance: float
     speed: float
     calories: float
-    message: str = ('Тип тренировки: {training_type}; '
-                    'Длительность: {duration:.3f} ч.; '
-                    'Дистанция: {distance:.3f} км; '
-                    'Ср. скорость: {speed:.3f} км/ч; '
-                    'Потрачено ккал: {calories:.3f}.')
+    message: ClassVar[str] = (
+        'Тип тренировки: {training_type}; '
+        'Длительность: {duration:.3f} ч.; '
+        'Дистанция: {distance:.3f} км; '
+        'Ср. скорость: {speed:.3f} км/ч; '
+        'Потрачено ккал: {calories:.3f}.'
+    )
 
     def get_message(self) -> str:
         """Вернуть строку сообщения."""
@@ -190,17 +192,16 @@ def read_package(workout_type: str, data: list[int, float]) -> Training:
                      рост пользователя.
     """
 
-    dict_training = {
+    dict_training: Dict[str, Type[Training]] = {
         'SWM': Swimming,
         'RUN': Running,
         'WLK': SportsWalking
     }
 
-    if workout_type not in dict_training.keys():
+    if workout_type not in dict_training:
         raise ValueError(f'Тренировка {workout_type} не найдена.')
 
-    result: Dict[str, Type[Training]] = dict_training[workout_type](*data)
-    return result
+    return dict_training[workout_type](*data)
 
 
 def main(training: Training) -> None:
